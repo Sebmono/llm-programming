@@ -3,5 +3,8 @@ Include = [
    "docs/*.md",
    "docs/docs/*.md",
    "docs/docs/**/*.md",
-   "docs/docs/**/**/*.md"
+   "docs/docs/**/**/*.md",
+   "dspy/*",
+   "dspy/**/*",
+   "dspy/**/**/*"
 ]
