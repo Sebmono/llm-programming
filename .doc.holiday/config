@@ -1,0 +1,6 @@
+Include = [
+   "!README.md",
+   "docs/*.md",
+   "docs/docs/*.md",
+   "docs/docs/**/*.md"
+]
