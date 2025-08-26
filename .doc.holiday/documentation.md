@@ -65,12 +65,14 @@ refine(question="What is the capital of Belgium?")
 - Include code examples where appropriate
 - Use consistent formatting for headers and lists, matching the existing formatting where possible
 - Always include a brief description for features beyond just a code snippet.
- 
+- For new DSPy adapters or modules (e.g., BAMLAdapter), always include a feature description, usage, and a code snippet.
+
 ## General Code Examples Guidelines
 - Use syntax highlighting
 - Include comments for complex logic
 - Show both input and expected output
- 
+- If a feature supports custom Pydantic schemas (e.g., BAMLAdapter or improved output adapters), include an example with a multi-level, described Pydantic schema in the documentation snippet as appropriate.
+
 ## General Structure of Writing Documentation & Release Notes
 - Start with an overview
 - Include step-by-step instructions
@@ -82,6 +84,7 @@ refine(question="What is the capital of Belgium?")
 ### Documentation Writing Rules
 When generating the Documentation, follow these rules:
 - If you update documentation for an existing feature, and there is information about what version of DSPy this is available on, make sure you call out this information.
+- For adapter and module documentation: if a new adapter (like BAMLAdapter) or a new signature/output support pattern is available, document it with feature description, code usage examples, and (if relevant) show complex Pydantic output formatting in examples.
 
 ## DSPy Docs Repo Structure and Contents
 Based on an analysis of all markdown files in /llm-programming/docs/docs/, here is the complete list of each file's contents and purpose:
