@@ -62,7 +62,7 @@ refine(question="What is the capital of Belgium?")
 ## General Writing Guidelines
 - Use clear, concise language
 - Important: be as concise as possible
-- Include code examples where appropriate
+- Include code examples where appropriate (always use current best types, e.g. `list[str]`, `dspy.Code`, new union syntax, etc.)
 - Use consistent formatting for headers and lists, matching the existing formatting where possible
 - Always include a brief description for features beyond just a code snippet.
  
@@ -82,6 +82,8 @@ refine(question="What is the capital of Belgium?")
 ### Documentation Writing Rules
 When generating the Documentation, follow these rules:
 - If you update documentation for an existing feature, and there is information about what version of DSPy this is available on, make sure you call out this information.
+- Use current recommended DSPy types including `list[str]`, `dict[str, int]`, PEP 604 unions (`int | str`), and custom DSPy types like `dspy.Code`.
+- Code snippets and type examples should use latest patterns (not legacy `List[str]` or `Dict[str, str]`).
 
 ## DSPy Docs Repo Structure and Contents
 Based on an analysis of all markdown files in /llm-programming/docs/docs/, here is the complete list of each file's contents and purpose:
