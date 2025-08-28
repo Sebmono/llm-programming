@@ -9,30 +9,13 @@ from dspy.teleprompt.teleprompt import Teleprompter
 logger = logging.getLogger(__name__)
 
 """
-USAGE SUGGESTIONS:
+COPRO (Collaborative Prompt Optimization) is a DSPy optimizer that iteratively improves module instructions for large language models by generating new candidate instructions, evaluating their performance, and selecting the highest-scoring versions. It supports prompt generation through a prompt model, configurable breadth & depth (number of candidates & rounds), and tracks optimization statistics if enabled. This optimizer is useful when explicit iterative prompt engineering yields improvements with smaller models.
 
-The following code can be used to compile a optimized signature teleprompter, and evaluate it on an end task:
-
-teleprompter = COPRO(prompt_model=prompt_model, metric=metric, breadth=BREADTH, depth=DEPTH, init_temperature=INIT_TEMPERATURE)
-kwargs = dict(num_threads=NUM_THREADS, display_progress=True, display_table=0)
-compiled_prompt_opt = teleprompter.compile(program.deepcopy(), trainset=trainset[:DEV_NUM], eval_kwargs=kwargs)
-eval_score = evaluate(compiled_prompt_opt, devset=evalset[:EVAL_NUM], **kwargs)
-
-Note that this teleprompter takes in the following parameters:
-
-* prompt_model: The model used for prompt generation. When unspecified, defaults to the model set in settings (ie. dspy.settings.configure(lm=task_model)).
-* metric: The task metric used for optimization.
-* breadth: The number of new prompts to generate at each iteration. Default=10.
-* depth: The number of times we should ask our prompt model to generate new prompts, with the history of the past prompts as input. Default=3.
-* init_temperature: The temperature used to generate new prompts. Higher roughly equals more creative. Default=1.4.
-* track_stats: Tells the method whether or not to track statistics about the optimization process.
-                If True, the method will track the following statistics:
-                    * results_best: The min,max,avg,stddev of top 10 scores for each predictor at each depth.
-                    * results_latest: The min,max,avg,stddev of newest prompt scores for each predictor at each depth.
-                    * total_calls: The total number of calls to the task metric.
-                These statistics will be returned as attributes of the best program.
+Example:
+    from dspy.teleprompt import COPRO
+    teleprompter = COPRO(prompt_model=prompt_model, metric=metric, breadth=BREADTH, depth=DEPTH, init_temperature=1.4)
+    optimized_program = teleprompter.compile(my_program, trainset=my_trainset, eval_kwargs={...})
 """
-
 
 class BasicGenerateInstruction(Signature):
     """You are an instruction optimizer for large language models. I will give you a ``signature`` of fields (inputs and outputs) in English. Your task is to propose an instruction that will lead a good language model to perform the task well. Don't be afraid to be creative."""
