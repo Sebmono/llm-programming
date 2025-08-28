@@ -109,16 +109,8 @@ class MIPROv2(Teleprompter):
         view_data_batch_size: int = 10,
         tip_aware_proposer: bool = True,
         fewshot_aware_proposer: bool = True,
-        requires_permission_to_run: bool | None = None, # deprecated
         provide_traceback: bool | None = None,
     ) -> Any:
-        if requires_permission_to_run == False:
-            logger.warning(
-                "'requires_permission_to_run' is deprecated and will be removed in a future version."
-            )
-        elif requires_permission_to_run == True:
-            raise ValueError("User confirmation is removed from MIPROv2. Please remove the 'requires_permission_to_run' argument.")
-
         effective_max_errors = (
             self.max_errors
             if self.max_errors is not None
@@ -629,7 +621,7 @@ class MIPROv2(Teleprompter):
 
         logger.info(f"Score: {score} on minibatch of size {batch_size} with parameters {chosen_params}.")
         minibatch_scores = ", ".join([f"{s['score']}" for s in score_data if not s["full_eval"]])
-        logger.info(f"Minibatch scores so far: {'[' + minibatch_scores + ']'}")
+        logger.info(f"Minibatch scores so far: '[' + minibatch_scores + '']")
         full_eval_scores = ", ".join([f"{s['score']}" for s in score_data if s["full_eval"]])
         trajectory = "[" + full_eval_scores + "]"
         logger.info(f"Full eval scores so far: {trajectory}")
@@ -662,7 +654,7 @@ class MIPROv2(Teleprompter):
 
         logger.info(f"Score: {score} with parameters {chosen_params}.")
         full_eval_scores = ", ".join([f"{s['score']}" for s in score_data if s["full_eval"]])
-        logger.info(f"Scores so far: {'[' + full_eval_scores + ']'}")
+        logger.info(f"Scores so far: '[' + full_eval_scores + '']")
         logger.info(f"Best score so far: {best_score}")
         logger.info(f"{'=' * len(f'===== Trial {trial.number + 1} / {num_trials} =====')}\n\n")
 
