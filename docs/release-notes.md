@@ -1,0 +1,51 @@
+## 2025-08-27
+
+### Breaking Changes
+- Removed deprecated settings `bypass_assert`, `bypass_suggest`, `assert_failures`, `suggest_failures`, and `backoff_time` from the settings module; these flags no longer exist (commit 592664ad)
+- Deprecated and removed the `return_outputs` constructor parameter in evaluation; passing it now raises a `ValueError`, and outputs are always returned in the `results` field of `EvaluationResult` (commit 1eca6cb1)
+
+### New Features
+- **XMLAdapter**: Handle XML-formatted input/output with validation and type casting (commit 716e82cf)
+- **Gemini LM Integration**: Authenticate and instantiate Gemini as an LM provider via `GEMINI_API_KEY` or `api_key` param (commit 540772d3)
+- **Databricks LM Update**: Switch default model to `llama-4` and adjust credential setup (commit 7a002385)
+- **PEP 604 Union Types**: Support `|`-style union annotations such as `int | None` (commit 95c0e4f4)
+- **ToolCalls.format**: Add `format` method to emit OpenAI-compatible tool-call schema (commit 4d19c3ee)
+- **`dspy.Code` Type**: Introduce code-snippet data type with parsing/formatting (commit 9006fbd0)
+- **`dspy.utils.syncify`**: Provide synchronous wrapper for async DSPy modules (commit ecb9c5e3)
+- **XML Streaming**: Enable XMLAdapter support in StreamListener to parse streamed XML (commit 982e20f7)
+- **`is_last_chunk` Flag**: Add boolean attribute to mark end of a streaming response (commit ab7ac0b9)
+- **OpenAI Response API**: Support `responses`-style completions and tool calls in LM client (commit 9029c3b7)
+- **`bootstrap_trace_data` Function**: Capture prediction traces and create `FailedPrediction` on parse errors (commit 84a4b7e5)
+- **Code Language Attribute**: Allow specifying `language` on `dspy.Code` for snippet validation (commit cacc02e6)
+- **`gpt-5` Model Option**: Add reasoning model requiring `max_tokens >= 20000` and `temperature = 1.0` (commit c899fcfa)
+- **GEPA Optimizer**: Introduce GEPA optimizer classes (`GEPA`, `DspyGEPAResult`) for program evolution via reflection (commit 26248897)
+- **GEPA API Integration**: Add GEPA to DSPy API docs, tutorials, and dependencies; bump project version (commit ed3895ea)
+- **GEPA v0.0.2 Update**: Update GEPA package to v0.0.2 and mandate `reflection_lm` parameter (commit 1967f4aa)
+- **GEPA Examples**: Provide notebooks and tutorials (PAPILLON, feedback loops) for GEPA workflows (commit 34090a25)
+
+### Enhancements
+- **Global `max_errors` Setting**: Add configurable error threshold in `dspy.settings` (commit 19d846a0)
+- **Async & Thread-Safe Config**: Refactor settings to use context variables for robust async/thread-local behavior (commit dd8cf1cb)
+- **AI Tool Permissions**: Extend `PythonInterpreter`, `ProgramOfThought`, and `CodeAct` with env‐var, file, and network controls plus file mounting (commit 5bc4a154)
+- **Restrict `configure` Ownership**: Allow `configure` only in the initial async task or main thread (commit c27eff3e)
+- **Async Adapters**: Add async call methods with fallback to structured output in ChatAdapter and JSONAdapter (commit 1df67689)
+- **Python 3.10+ Support**: Drop Python 3.9 support; require >=3.10 (commit 1697f15a)
+- **Dynamic Model Recognition**: Replace static OpenAI model list with prefix‐based detection (commit d836fd8f)
+- **Limit History & Trace Buffers**: Add config to cap memory usage in history management (commit fce51377)
+- **Reusable Stream Listener**: Introduce `allow_reuse` to reset state for repeated listeners (commit 64881c76)
+
+### Bug Fixes
+- **Pydantic v2 Compatibility**: Update `json_adapter` to use `ConfigDict` and disable LM caching in tests (commit 63020fdd)
+- **Custom Type Extraction**: Fix nested custom-type handling for Python 3.10+ annotations (commit 4f154a7c)
+- **Usage Tracking**: Correct aggregation when usage values are `None` (commit ede6434c)
+- **Non-Blocking Streaming**: Ensure asynchronous, non-blocking status message streaming (commit a97437b2)
+- **Stream Listener Spacing**: Fix space handling for start-identifier detection in streaming (commit b5390e9b)
+- **Invalid LM Errors**: Provide descriptive messages for invalid, missing, or mistyped LM instances (commit 0a6b50e0)
+- **JSONAdapter Exceptions**: Allow exceptions to pass through instead of fallback formatting (commit 734eff21)
+- **Tool End Status Fix**: Correct parameters in `tool_end_status_message` and `status_message_provider` init (commit 6085284)
+- **BootstrapFinetune Backward Compat**: Add test to load saved programs from older versions (commit 577ddc80)
+- **Ensure Signature Return Type**: Fix `ensure_signature` return annotation to always produce a `Signature` (commit 4173100e)
+- **Fix gbk Unicode Errors**: Address `UnicodeDecodeError` in interpreter and module code (commit 6ead3da6)
+- **MCP Tool Conversion**: Handle schemas with no inputs in MCP tool conversion (commit cd9ae6e6)
+- **Authorization Header Fix**: Add GitHub access token header for authenticated API requests (commit f4568071)
+- **BAMLAdapter Circular Reference**: Resolve schema errors and circular-reference handling in BAMLAdapter (commit 43e241e4)
