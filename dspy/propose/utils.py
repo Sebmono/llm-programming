@@ -2,18 +2,6 @@ import inspect
 import json
 import re
 
-import dspy
-
-try:
-    from IPython.core.magics.code import extract_symbols
-except ImportError:
-    # Won't be able to read code from jupyter notebooks
-    extract_symbols = None
-
-from dspy.predict.parameter import Parameter
-from dspy.teleprompt.utils import get_signature, new_getfile
-
-
 def strip_prefix(text):
     pattern = r"^[\*\s]*(([\w\'\-]+\s+){0,4}[\w\'\-]+):\s*"
     modified_text = re.sub(pattern, "", text)

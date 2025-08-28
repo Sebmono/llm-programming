@@ -14,6 +14,7 @@ from dspy.teleprompt.bootstrap_finetune import (
 )
 from dspy.teleprompt.random_search import BootstrapFewShotWithRandomSearch
 from dspy.teleprompt.teleprompt import Teleprompter
+from dspy.teleprompt.gepa import GEPA
 
 logger = logging.getLogger(__name__)
 
@@ -37,15 +38,16 @@ class BetterTogether(Teleprompter):
         # a BootstrapFinetune without a metric, say, if there aren't labels
         # available for the training data. Should this be noted somewhere?
         # TODO: We should re-consider if the metric should be required.
+        # GEPA: GEPA is now a supported optimizer for both prompt and weight optimization.
         self.prompt_optimizer = prompt_optimizer if prompt_optimizer else BootstrapFewShotWithRandomSearch(metric=metric)
         self.weight_optimizer = weight_optimizer if weight_optimizer else BootstrapFinetune(metric=metric)
 
-        is_supported_prompt = isinstance(self.prompt_optimizer, BootstrapFewShotWithRandomSearch)
-        is_supported_weight = isinstance(self.weight_optimizer, BootstrapFinetune)
+        is_supported_prompt = isinstance(self.prompt_optimizer, (BootstrapFewShotWithRandomSearch, GEPA))
+        is_supported_weight = isinstance(self.weight_optimizer, (BootstrapFinetune, GEPA))
         if not is_supported_prompt or not is_supported_weight:
             raise ValueError(
                 "The BetterTogether optimizer only supports the following optimizers for now: BootstrapFinetune, "
-                "BootstrapFewShotWithRandomSearch."
+                "BootstrapFewShotWithRandomSearch, GEPA."
             )
 
         self.rng = random.Random(seed)
