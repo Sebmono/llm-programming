@@ -163,7 +163,7 @@ class GEPA(Teleprompter):
         pred_name: Optional[str] = None,
         pred_trace: Optional[DSPyTrace] = None,
     ) -> float | ScoreWithFeedback:
-        \"""
+        """
         This function is called with the following arguments:
         - gold: The gold example.
         - pred: The predicted output.
@@ -181,7 +181,7 @@ class GEPA(Teleprompter):
         (using just the gold, pred and trace).
         If no feedback is returned, GEPA will use a simple text feedback consisting of just the score: 
         f"This trajectory got a score of {score}."
-        \"""
+        """
         ...
     ```
 

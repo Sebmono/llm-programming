@@ -39,6 +39,26 @@ class OfferFeedback(Signature):
 
 
 class Refine(Module):
+    """
+    Refines a module by running it up to `N` times with different temperatures and returns the best prediction, as defined by the reward_fn, or the first prediction that passes the threshold. After each attempt (except the final one), `Refine` automatically generates detailed feedback about the module's performance and uses this feedback as hints for subsequent runs, creating an iterative refinement process.
+
+    Example:
+    ```python
+    import dspy
+    # Use a chain-of-thought QA module as the base
+    qa = dspy.ChainOfThought("question -> answer")
+    # Define a reward function that checks for one-word answers
+    def one_word_answer(args, pred):
+        return 1.0 if len(pred.answer.split()) == 1 else 0.0
+    # Create the refined module
+    best_of_3 = dspy.Refine(module=qa, N=3, reward_fn=one_word_answer, threshold=1.0)
+    # Use the refined module
+    result = best_of_3(question="What is the capital of Belgium?").answer
+    # Returns: Brussels
+    ```
+
+    By default, `Refine` will try to run the base module up to N times until the threshold is met. If the module encounters an error, it will keep going up to N failed attempts. You can adjust this behavior with the `fail_count` argument to control the number of computation attempts allowed before raising an error.
+    """
     def __init__(
         self,
         module: Module,
@@ -47,42 +67,6 @@ class Refine(Module):
         threshold: float,
         fail_count: int | None = None,
     ):
-        """
-        Refines a module by running it up to N times with different temperatures and returns the best prediction.
-
-        This module runs the provided module multiple times with varying temperature settings and selects
-        either the first prediction that exceeds the specified threshold or the one with the highest reward.
-        If no prediction meets the threshold, it automatically generates feedback to improve future predictions.
-
-
-        Args:
-            module (Module): The module to refine.
-            N (int): The number of times to run the module. must
-            reward_fn (Callable): The reward function.
-            threshold (float): The threshold for the reward function.
-            fail_count (Optional[int], optional): The number of times the module can fail before raising an error
-
-        Example:
-            ```python
-            import dspy
-
-            dspy.settings.configure(lm=dspy.LM("openai/gpt-4o-mini"))
-
-            # Define a QA module with chain of thought
-            qa = dspy.ChainOfThought("question -> answer")
-
-            # Define a reward function that checks for one-word answers
-            def one_word_answer(args, pred):
-                return 1.0 if len(pred.answer.split()) == 1 else 0.0
-
-            # Create a refined module that tries up to 3 times
-            best_of_3 = dspy.Refine(module=qa, N=3, reward_fn=one_word_answer, threshold=1.0)
-
-            # Use the refined module
-            result = best_of_3(question="What is the capital of Belgium?").answer
-            # Returns: Brussels
-            ```
-        """
         self.module = module
         self.reward_fn = lambda *args: reward_fn(*args)  # to prevent this from becoming a parameter
         self.threshold = threshold

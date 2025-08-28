@@ -1,102 +1,64 @@
-from dspy.predict.chain_of_thought import ChainOfThought
-from dspy.primitives import Module
-from dspy.signatures import InputField, OutputField, Signature
+# dspy.SemanticF1 and dspy.CompleteAndGrounded
 
+DSPy offers automatic evaluation modules for programmatic assessment of prediction quality based on semantic similarity and information completeness/groundedness.
 
-class SemanticRecallPrecision(Signature):
-    """
-    Compare a system's response to the ground truth to compute its recall and precision.
-    If asked to reason, enumerate key ideas in each response, and whether they are present in the other response.
-    """
+## dspy.SemanticF1
 
-    question: str = InputField()
-    ground_truth: str = InputField()
-    system_response: str = InputField()
-    recall: float = OutputField(desc="fraction (out of 1.0) of ground truth covered by the system response")
-    precision: float = OutputField(desc="fraction (out of 1.0) of system response covered by the ground truth")
+Measures semantic similarity between a predicted response and the ground truth using LLM-powered scoring. Optionally decomposes both responses to compare reasoning overlap.
 
+```python
+from dspy.evaluate import SemanticF1
+from dspy.datasets import HotPotQA
 
-class DecompositionalSemanticRecallPrecision(Signature):
-    """
-    Compare a system's response to the ground truth to compute recall and precision of key ideas.
-    You will first enumerate key ideas in each response, discuss their overlap, and then report recall and precision.
-    """
+dspy.settings.configure(lm=dspy.LM('openai/gpt-4o-mini'))
+dataset = HotPotQA(train_seed=2024, train_size=500)
+module = dspy.ChainOfThought("question -> response")
 
-    question: str = InputField()
-    ground_truth: str = InputField()
-    system_response: str = InputField()
-    ground_truth_key_ideas: str = OutputField(desc="enumeration of key ideas in the ground truth")
-    system_response_key_ideas: str = OutputField(desc="enumeration of key ideas in the system response")
-    discussion: str = OutputField(desc="discussion of the overlap between ground truth and system response")
-    recall: float = OutputField(desc="fraction (out of 1.0) of ground truth covered by the system response")
-    precision: float = OutputField(desc="fraction (out of 1.0) of system response covered by the ground truth")
+# Initialize metric
+metric = SemanticF1(threshold=0.7, decompositional=False)
 
+score = metric(dataset.train[0], module(dataset.train[0]))
+```
 
-def f1_score(precision, recall):
-    precision, recall = max(0.0, min(1.0, precision)), max(0.0, min(1.0, recall))
-    return 0.0 if precision + recall == 0 else 2 * (precision * recall) / (precision + recall)
+## dspy.CompleteAndGrounded
 
+Evaluates both answer completeness (relative to ground truth) and factual groundedness (relative to retrieved evidence), then combines them as an F1 score.
 
-class SemanticF1(Module):
-    def __init__(self, threshold=0.66, decompositional=False):
-        self.threshold = threshold
+```python
+from dspy.evaluate import CompleteAndGrounded
 
-        if decompositional:
-            self.module = ChainOfThought(DecompositionalSemanticRecallPrecision)
-        else:
-            self.module = ChainOfThought(SemanticRecallPrecision)
+metric = CompleteAndGrounded(threshold=0.66)
+score = metric(example, module(example))
+```
 
-    def forward(self, example, pred, trace=None):
-        scores = self.module(question=example.question, ground_truth=example.response, system_response=pred.response)
-        score = f1_score(scores.precision, scores.recall)
+## API Reference
 
-        return score if trace is None else score >= self.threshold
+<!-- START_API_REF -->
+::: dspy.SemanticF1
+    handler: python
+    options:
+        show_source: true
+        show_root_heading: true
+        heading_level: 2
+        docstring_style: google
+        show_root_full_path: true
+        show_object_full_path: false
+        separate_signature: false
+        inherited_members: true
+:::
+<!-- END_API_REF -->
 
-
-
-###########
-
-
-class AnswerCompleteness(Signature):
-    """
-    Estimate the completeness of a system's responses, against the ground truth.
-    You will first enumerate key ideas in each response, discuss their overlap, and then report completeness.
-    """
-
-    question: str = InputField()
-    ground_truth: str = InputField()
-    system_response: str = InputField()
-    ground_truth_key_ideas: str = OutputField(desc="enumeration of key ideas in the ground truth")
-    system_response_key_ideas: str = OutputField(desc="enumeration of key ideas in the system response")
-    discussion: str = OutputField(desc="discussion of the overlap between ground truth and system response")
-    completeness: float = OutputField(desc="fraction (out of 1.0) of ground truth covered by the system response")
-
-
-
-class AnswerGroundedness(Signature):
-    """
-    Estimate the groundedness of a system's responses, against real retrieved documents written by people.
-    You will first enumerate whatever non-trivial or check-worthy claims are made in the system response, and then
-    discuss the extent to which some or all of them can be deduced from the retrieved context and basic commonsense.
-    """
-
-    question: str = InputField()
-    retrieved_context: str = InputField()
-    system_response: str = InputField()
-    system_response_claims: str = OutputField(desc="enumeration of non-trivial or check-worthy claims in the system response")
-    discussion: str = OutputField(desc="discussion of how supported the claims are by the retrieved context")
-    groundedness: float = OutputField(desc="fraction (out of 1.0) of system response supported by the retrieved context")
-
-
-class CompleteAndGrounded(Module):
-    def __init__(self, threshold=0.66):
-        self.threshold = threshold
-        self.completeness_module = ChainOfThought(AnswerCompleteness)
-        self.groundedness_module = ChainOfThought(AnswerGroundedness)
-
-    def forward(self, example, pred, trace=None):
-        completeness = self.completeness_module(question=example.question, ground_truth=example.response, system_response=pred.response)
-        groundedness = self.groundedness_module(question=example.question, retrieved_context=pred.context, system_response=pred.response)
-        score = f1_score(groundedness.groundedness, completeness.completeness)
-
-        return score if trace is None else score >= self.threshold
+<!-- START_API_REF -->
+::: dspy.CompleteAndGrounded
+    handler: python
+    options:
+        show_source: true
+        show_root_heading: true
+        heading_level: 2
+        docstring_style: google
+        show_root_full_path: true
+        show_object_full_path: false
+        separate_signature: false
+        inherited_members: true
+:::
+<!-- END_API_REF -->
